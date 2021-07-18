@@ -71,15 +71,8 @@ void setup() {
 void loop() {
   
   alti.logCSV();
-  
-  if (status == true){
   menu="RecordMenu!";
-  status=false;
-  }
-    else if (status==false){
-    menu="";
-    status=true;
-  }
   alti.valueDISP(menu);
+  
   delay(1000);
 }
