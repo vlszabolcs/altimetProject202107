@@ -71,8 +71,8 @@ void setup() {
 void loop() {
   
   alti.logCSV();
-  menu="RecordMenu!";
+  menu="RecordMen u!";
   alti.valueDISP(menu);
-  
+
   delay(1000);
 }
