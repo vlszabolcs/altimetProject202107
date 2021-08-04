@@ -20,8 +20,6 @@ RTC_DS3231 rtc;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
-
-
 class altiFunc {
     public:
         String message;
@@ -55,17 +53,19 @@ void altiFunc::timeSync () {
   rtc.adjust(DateTime(timeClient.getEpochTime()));
   DateTime time = rtc.now();
   Serial.println(String("Time Synchronized:\t") + time.timestamp());
+  
 }
 
 void altiFunc:: logCSV(){
     sensData();
     if (recFirstRun == true) {
         //creat file name 
-        timestp.replace("-" , "");
-        timestp.replace(":" , "_");
-        path = "/" + timestp + ".csv";
+        String filename = timestp;
+        filename.replace("-" , "");
+        filename.replace(":" , "_");
+        path = "/" + filename + ".csv";
         //
-        String head = "Time,Pressure,Temperature,Altitude,";
+        String head = "Time,Pressure,Temperature,Altitude";
         Serial.print("RecordMenu--> FirstRun: ");
         Serial.println(path);
         Serial.println(message);
@@ -108,4 +108,5 @@ void altiFunc::valueDISP(String acutalMenu){
     display.println(intAlt);
     display.display();
 }
+
 
