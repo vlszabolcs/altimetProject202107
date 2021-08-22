@@ -19,7 +19,7 @@ WebServer server(80);
 altiFunc alti;
 
 bool status = true;
-String menu;
+
 
 
 String SendHTML(float temperature,String timestp,float pressure,float altitude){
@@ -163,6 +163,11 @@ void setup() {
     
     if (String(WiFi.SSID()) != "aaa"){
       alti.timeSync();
+      DateTime time = rtc.now();
+      String filename = (time.timestamp(DateTime::TIMESTAMP_FULL))+"Z";
+      filename.replace("-" , "");
+      filename.replace(":" , "_");
+      alti.path = "/" + filename + ".csv";
     }
   }
 
@@ -191,12 +196,14 @@ void setup() {
   server.onNotFound(NotFound);
   server.begin();
   Serial.println("HTTP server started");
+
+  
 }
 
 void loop() {
+
   alti.logCSV();
-  menu="RecordMen u!";
-  alti.valueDISP(menu);
+  //alti.valueDISP("RecordMen u!");
   server.handleClient();
   delay(1000);
 }

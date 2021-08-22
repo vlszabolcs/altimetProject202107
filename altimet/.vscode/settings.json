@@ -2,6 +2,8 @@
     "files.associations": {
         "esp32-hal.h": "c",
         "esp_system.h": "c",
-        "esp32-hal-timer.h": "c"
+        "esp32-hal-timer.h": "c",
+        "array": "cpp",
+        "string": "cpp"
     }
 }

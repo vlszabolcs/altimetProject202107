@@ -24,6 +24,8 @@ class altiFunc {
     public:
         String message;
         String timestp;
+        String path;
+        File file;
         float pres;
         float temp ;
         float alti ;
@@ -31,20 +33,21 @@ class altiFunc {
         void sensData();
         void timeSync ();
         void logCSV();
-        void valueDISP(String acutalMenu);
+        //void valueDISP(String acutalMenu);
     private:
        bool recFirstRun=true;
-       String path;
+       
 };
 
 void altiFunc::sensData () {
   DateTime time = rtc.now();
-  timestp = time.timestamp(DateTime::TIMESTAMP_FULL);
-  timestp = timestp+"Z";
+  timestp = (time.timestamp(DateTime::TIMESTAMP_FULL))+"Z";
+ //timestp = timestp+"Z";
   pres = bmp.readPressure() / 100.0F;
   temp = bmp.readTemperature()-2;
   alti = bmp.readAltitude(presCorrig);
   message = timestp + "," + String(pres) + "," + String(temp) + "," + String(alti);
+
 }
 
 void altiFunc::timeSync () {
@@ -52,46 +55,41 @@ void altiFunc::timeSync () {
   timeClient.update();
   rtc.adjust(DateTime(timeClient.getEpochTime()));
   DateTime time = rtc.now();
-  Serial.println(String("Time Synchronized:\t") + time.timestamp());
-  
+  Serial.println(String("Time Synchronized:\t") + time.timestamp()); 
 }
 
 void altiFunc:: logCSV(){
     sensData();
     if (recFirstRun == true) {
-        //creat file name 
+       ///creat file name 
         String filename = timestp;
         filename.replace("-" , "");
         filename.replace(":" , "_");
         path = "/" + filename + ".csv";
-        //
         String head = "Time,Pressure,Temperature,Altitude";
         Serial.print("RecordMenu--> FirstRun: ");
         Serial.println(path);
         Serial.println(message);
         Serial.println();
-        File file = SD.open(path, FILE_WRITE);
+        file = SD.open(path, FILE_WRITE);
         if (file) {
             file.println(head);
-            file.println(message);
+            //file.println(message);
         } else {Serial.println("Failed to open file for writing");}
-        file.close();
         recFirstRun = false;
-
+        
     } else {
+       
         Serial.print("RecordMenu--> anyRun: ");
-        Serial.println(path);
         Serial.println(message);
-        Serial.println();
-        File file = SD.open(path , FILE_APPEND);
         if (file) {
         file.println(message);
+        file.flush();
         }
-        file.close();
   }
 }
 
-void altiFunc::valueDISP(String acutalMenu){
+/*void altiFunc::valueDISP(String acutalMenu){
     display.clearDisplay();
     display.setCursor(0, 0);
     display.println(acutalMenu);
@@ -107,6 +105,6 @@ void altiFunc::valueDISP(String acutalMenu){
     int intAlt = (int) alti;
     display.println(intAlt);
     display.display();
-}
+}*/
 
 
