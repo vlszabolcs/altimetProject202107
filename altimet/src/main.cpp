@@ -7,21 +7,23 @@
 #include "SPI.h"
 #include <PubSubClient.h>
 
-#include <WebServer.h>
+//#include <WebServer.h>
+
+
+
+//My include:
+#include "wifiConfig.h"
+#include "webDisplay.h"
+#include "altifunction.h"
+
 
 WebServer server(80); 
-
-//Saját:
-#include "wifiConfig.h"
-//#include "webDisplay.h"
-#include "altifunction.h"
 
 altiFunc alti;
 
 bool status = true;
 
-
-
+/*
 String SendHTML(float temperature,String timestp,float pressure,float altitude){
 
   String ptr = "<!DOCTYPE html>";
@@ -119,6 +121,7 @@ String SendHTML(float temperature,String timestp,float pressure,float altitude){
   ptr +="</html>";
   return ptr;
 }
+*/
 
 void OnConnect() {
   float temperature = alti.temp;

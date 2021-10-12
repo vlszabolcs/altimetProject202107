@@ -1,33 +1,23 @@
 
 #include <WebServer.h>
-#include "altifunction.h"
-
-altiFunc alti ;
-
-WebServer server(80);             
+//#include "altifunction.h"
+             
  
-class webDisplay{
+/*class webDisplay{
     public:
-    void OnConnect();
-    void NotFound();
+    //void OnConnect();
+    //void NotFound();
+    String sendHTML(float temperature, String timestp,float pressure,float altitude);
 
-    private:
-
-    float temperature = alti.temp;
-    float pressure= alti.pres;
-    float altitude = alti.alti;
-    String timestp =alti.timestp;
-  
-    
-};
+};*/
  
 
 
 
 
-String SendHTML(float temperature,String timestp,float pressure,float altitude){
+String SendHTML(float temperature, String timestp,float pressure,float altitude){
 
-  String ptr = "<!DOCTYPE html>";
+String ptr = "<!DOCTYPE html>";
   ptr +="<html>";
   ptr +="<head>";
   ptr +="<title>ESP Weather Station</title>";
@@ -39,9 +29,9 @@ String SendHTML(float temperature,String timestp,float pressure,float altitude){
   ptr +="h1 {margin: 50px auto 30px;} ";
   ptr +=".side-by-side{display: table-cell;vertical-align: middle;position: relative;}";
   ptr +=".text{font-weight: 600;font-size: 19px;width: 200px;}";
-  ptr +=".reading{font-weight: 300;font-size: 50px;padding-right: 25px;}";
+  ptr +=".reading{font-weight: 300;font-size:30px;padding-right: 25px;}";
   ptr +=".temperature .reading{color: #F29C1F;}";
-  ptr +=".humidity .reading{color: #3B97D3;}";
+  ptr +=".time .reading{color: #3B97D3;}";
   ptr +=".pressure .reading{color: #26B99A;}";
   ptr +=".altitude .reading{color: #955BA5;}";
   ptr +=".superscript{font-size: 17px;font-weight: 600;position: absolute;top: 10px;}";
@@ -51,9 +41,22 @@ String SendHTML(float temperature,String timestp,float pressure,float altitude){
   ptr +="</style>";
   ptr +="</head>";
   ptr +="<body>";
-  ptr +="<h1>ESP8266/ESP32 Mini Weather Station</h1>";
-  ptr +="<h3>https://theiotprojects.com</h3>";
+  ptr +="<h3>Altimeter data</h3>";
   ptr +="<div class='container'>";
+
+  ptr +="<div class='data time'>";
+  ptr +="<div class='side-by-side icon'>";
+  ptr +="<svg enable-background='new 0 0 29.235 40.64'height=40.64px id=Layer_1 version=1.1 viewBox='0 0 29.235 40.64'width=29.235px x=0px xml:space=preserve xmlns=http://www.w3.org/2000/svg xmlns:xlink=http://www.w3.org/1999/xlink y=0px><path d='M14.618,0C14.618,0,0,17.95,0,26.022C0,34.096,6.544,40.64,14.618,40.64s14.617-6.544,14.617-14.617";
+  ptr +="C29.235,17.95,14.618,0,14.618,0z M13.667,37.135c-5.604,0-10.162-4.56-10.162-10.162c0-0.787,0.638-1.426,1.426-1.426";
+  ptr +="c0.787,0,1.425,0.639,1.425,1.426c0,4.031,3.28,7.312,7.311,7.312c0.787,0,1.425,0.638,1.425,1.425";
+  ptr +="C15.093,36.497,14.455,37.135,13.667,37.135z'fill=#3C97D3 /></svg>";
+  ptr +="</div>";
+  ptr +="<div class='side-by-side text'>Time</div>";
+  ptr +="<div class='side-by-side reading'>";
+  ptr +=(String)timestp;
+  ptr +="<span class='superscript'></span></div>";
+  ptr +="</div>";
+
   ptr +="<div class='data temperature'>";
   ptr +="<div class='side-by-side icon'>";
   ptr +="<svg enable-background='new 0 0 19.438 54.003'height=54.003px id=Layer_1 version=1.1 viewBox='0 0 19.438 54.003'width=19.438px x=0px xml:space=preserve xmlns=http://www.w3.org/2000/svg xmlns:xlink=http://www.w3.org/1999/xlink y=0px><g><path d='M11.976,8.82v-2h4.084V6.063C16.06,2.715,13.345,0,9.996,0H9.313C5.965,0,3.252,2.715,3.252,6.063v30.982";
@@ -64,21 +67,12 @@ String SendHTML(float temperature,String timestp,float pressure,float altitude){
   ptr +="</div>";
   ptr +="<div class='side-by-side text'>Temperature</div>";
   ptr +="<div class='side-by-side reading'>";
-  ptr +=(int)temperature;
-  ptr +="<span class='superscript'>°C</span></div>";
+  ptr +=(float)temperature;
+  ptr +="<span class='superscript'>*C</span></div>";
   ptr +="</div>";
-  ptr +="<div class='data humidity'>";
-  ptr +="<div class='side-by-side icon'>";
-  ptr +="<svg enable-background='new 0 0 29.235 40.64'height=40.64px id=Layer_1 version=1.1 viewBox='0 0 29.235 40.64'width=29.235px x=0px xml:space=preserve xmlns=http://www.w3.org/2000/svg xmlns:xlink=http://www.w3.org/1999/xlink y=0px><path d='M14.618,0C14.618,0,0,17.95,0,26.022C0,34.096,6.544,40.64,14.618,40.64s14.617-6.544,14.617-14.617";
-  ptr +="C29.235,17.95,14.618,0,14.618,0z M13.667,37.135c-5.604,0-10.162-4.56-10.162-10.162c0-0.787,0.638-1.426,1.426-1.426";
-  ptr +="c0.787,0,1.425,0.639,1.425,1.426c0,4.031,3.28,7.312,7.311,7.312c0.787,0,1.425,0.638,1.425,1.425";
-  ptr +="C15.093,36.497,14.455,37.135,13.667,37.135z'fill=#3C97D3 /></svg>";
-  ptr +="</div>";
-  ptr +="<div class='side-by-side text'>Humidity</div>";
-  ptr +="<div class='side-by-side reading'>";
-  ptr +=(String)timestp;
-  ptr +="<span class='superscript'>%</span></div>";
-  ptr +="</div>";
+
+  
+
   ptr +="<div class='data pressure'>";
   ptr +="<div class='side-by-side icon'>";
   ptr +="<svg enable-background='new 0 0 40.542 40.541'height=40.541px id=Layer_1 version=1.1 viewBox='0 0 40.542 40.541'width=40.542px x=0px xml:space=preserve xmlns=http://www.w3.org/2000/svg xmlns:xlink=http://www.w3.org/1999/xlink y=0px><g><path d='M34.313,20.271c0-0.552,0.447-1,1-1h5.178c-0.236-4.841-2.163-9.228-5.214-12.593l-3.425,3.424";
@@ -93,9 +87,10 @@ String SendHTML(float temperature,String timestp,float pressure,float altitude){
   ptr +="</div>";
   ptr +="<div class='side-by-side text'>Pressure</div>";
   ptr +="<div class='side-by-side reading'>";
-  ptr +=(int)pressure;
+  ptr +=(float)pressure;
   ptr +="<span class='superscript'>hPa</span></div>";
   ptr +="</div>";
+
   ptr +="<div class='data altitude'>";
   ptr +="<div class='side-by-side icon'>";
   ptr +="<svg enable-background='new 0 0 58.422 40.639'height=40.639px id=Layer_1 version=1.1 viewBox='0 0 58.422 40.639'width=58.422px x=0px xml:space=preserve xmlns=http://www.w3.org/2000/svg xmlns:xlink=http://www.w3.org/1999/xlink y=0px><g><path d='M58.203,37.754l0.007-0.004L42.09,9.935l-0.001,0.001c-0.356-0.543-0.969-0.902-1.667-0.902";
@@ -108,15 +103,16 @@ String SendHTML(float temperature,String timestp,float pressure,float altitude){
   ptr +="</div>";
   ptr +="<div class='side-by-side text'>Altitude</div>";
   ptr +="<div class='side-by-side reading'>";
-  ptr +=(int)altitude;
+  ptr +=(float)altitude;
   ptr +="<span class='superscript'>m</span></div>";
   ptr +="</div>";
+
   ptr +="</div>";
   ptr +="</body>";
   ptr +="</html>";
   return ptr;
 }
-
+/*
 void webDisplay::OnConnect() {
   temperature = alti.temp;
   timestp = alti.timestp;
@@ -127,5 +123,5 @@ void webDisplay::OnConnect() {
 
  void webDisplay::NotFound(){
   server.send(404, "text/plain", "Not found");
-}
+}*/
  
