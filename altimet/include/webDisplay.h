@@ -2,16 +2,6 @@
 #include <WebServer.h>
 //#include "altifunction.h"
              
- 
-/*class webDisplay{
-    public:
-    //void OnConnect();
-    //void NotFound();
-    String sendHTML(float temperature, String timestp,float pressure,float altitude);
-
-};*/
- 
-
 
 
 
@@ -70,8 +60,6 @@ String ptr = "<!DOCTYPE html>";
   ptr +=(float)temperature;
   ptr +="<span class='superscript'>*C</span></div>";
   ptr +="</div>";
-
-  
 
   ptr +="<div class='data pressure'>";
   ptr +="<div class='side-by-side icon'>";
