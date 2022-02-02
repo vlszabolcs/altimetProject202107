@@ -1,77 +1,49 @@
 #include <Arduino.h>
 #include <time.h>
 
-#include <Adafruit_SSD1306.h>
+//#include <Adafruit_SSD1306.h>
 #include <Wire.h>
-#include <Adafruit_GFX.h>
+//#include <Adafruit_GFX.h>
 #include "SPI.h"
-#include <PubSubClient.h>
+
+//#include <WiFiMulti.h>
+//WiFiMulti wifiMulti;
 
 //My include:
-#include "wifiConfig.h"
-#include "webDisplay.h"
+//#include "wifiConfig.h"
 #include "altifunction.h"
-
-WebServer server(80); 
 altiFunc alti;
 
 bool status = true;
+int period = 1000;
+unsigned long time_now = 0;
 
-void OnConnect() {
-  float temperature = alti.temp;
-  String timestp = alti.timestp;
-  float pressure =  alti.pres;
-  float altitude =   alti.alti;
-  server.send(200, "text/html", SendHTML(temperature,timestp,pressure,altitude));
-};
-
-void NotFound(){
-  server.send(404, "text/plain", "Not found");
-};
-
-void setup() {
-
-  Serial.begin(115200);
-
-  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-      Serial.println(F("SSD1306 allocation failed"));
-      for (;;); // Don't proceed, loop forever
+void bmp280Setup(){
+  if (!bmp.begin(0x76)) {
+    Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
+    while (1);
     }
-  display.display();
-  display.clearDisplay();
-  display.setTextSize(1); 
-  display.setTextColor(SSD1306_WHITE);
+  bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
+                  Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
+                  Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
+                  Adafruit_BMP280::FILTER_X16,      /* Filtering. */
+                  Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */  
 
-  wifiConnect();
-  
-  if (! rtc.begin()) {
-      Serial.println("Couldn't find RTC");
-      Serial.flush();
-      abort();
-    }
-  
-  if (wifiMulti.run() == WL_CONNECTED) {
+}
+
+void wifiSetup() {
+    /*wifiConnect();
+    if (wifiMulti.run() == WL_CONNECTED) {
     Serial.println("");
     Serial.println("WiFi connected");
     Serial.println(WiFi.SSID());
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
-    
-    if (String(WiFi.SSID()) != "aaa"){
-      alti.timeSync();
-      DateTime time = rtc.now();
-      String filename = (time.timestamp(DateTime::TIMESTAMP_FULL))+"Z";
-      filename.replace("-" , "");
-      filename.replace(":" , "_");
-      alti.path = "/" + filename + ".csv";
-    }
-  }
+  }*/
+}
 
-  if (!bmp.begin(0x76)) {
-    Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
-    while (1);
-    }
-
+void firstSetup(){
+  //Read data form SD Card
   if (!SD.begin()) {
     Serial.println("Card Mount Failed");
     return;
@@ -86,18 +58,44 @@ void setup() {
     Serial.println("Error to open last pressure calc.");
   }
 
-  Serial.print("Got IP: ");  Serial.println(WiFi.localIP());
- 
-  server.on("/", OnConnect);
-  server.onNotFound(NotFound);
-  server.begin();
-  Serial.println("HTTP server started");
+
+}
+
+void setup() {
+
+  Serial.begin(115200);
+  Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
+  //SerialBT.begin("ESPaltimet");
+
+/*
+  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+      Serial.println(F("SSD1306 allocation failed"));
+      for (;;); // Don't proceed, loop forever
+    }
+  display.display();
+  display.clearDisplay();
+  display.setTextSize(1); 
+  display.setTextColor(SSD1306_WHITE);
+*/
+  
+  //wifiSetup();
+  bmp280Setup();
+  firstSetup();
 }
 
 void loop() {
 
-  alti.logCSV();
-  //alti.valueDISP("RecordMen u!");
-  server.handleClient();
-  delay(1000);
+  if(millis() > time_now + period){
+      time_now = millis();
+      alti.logCSV();
+      
+  }
+   
+  alti.gpsData();
+
+   /*if (Serial2.available()){
+    Serial.write(Serial2.read());
+   }*/
+  
+  //delay(1000);
 }
